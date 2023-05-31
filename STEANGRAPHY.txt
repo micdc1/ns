@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define FILE_HEADER_SIZE 54
+
+// Function to hide the message within the image
+void hideMessage(FILE *image, FILE *output, char *message) {
+    char ch, bit;
+    int i = 0, j = 0;
+
+    // Read and write the header of the image file
+    while (i < FILE_HEADER_SIZE) {
+        ch = fgetc(image);
+        fputc(ch, output);
+        i++;
+    }
+
+    // Start hiding the message
+    while ((ch = fgetc(image)) != EOF && message[j] != '\0') {
+        // Iterate over each bit of the message character
+        for (i = 7; i >= 0; i--) {
+            bit = (message[j] >> i) & 1; // Extract the current bit
+
+            // Modify the least significant bit of the pixel value
+            ch = (ch & 0xFE) | bit;
+
+            // Write the modified pixel value to the output image
+            fputc(ch, output);
+        }
+        j++;
+    }
+
+    // Copy the remaining pixels from the original image to the output image
+    while ((ch = fgetc(image)) != EOF) {
+        fputc(ch, output);
+    }
+
+    // Close the files
+    fclose(image);
+    fclose(output);
+}
+
+// Function to extract the hidden message from the image
+void extractMessage(FILE *image) {
+    char ch, bit;
+    int  count = 0;
+    char message[100];
+
+    // Skip the header of the image file
+    fseek(image, FILE_HEADER_SIZE, SEEK_SET);
+
+    // Extract the hidden message
+    while ((ch = fgetc(image)) != EOF && count < 100) {
+        // Extract the least significant bit
+        bit = ch & 1;
+
+        // Append the extracted bit to the message
+        message[count / 8] = (message[count / 8] << 1) | bit;
+
+        count++;
+    }
+
+    message[count / 8] = '\0'; // Add null terminator to the message
+
+    // Print the extracted message
+    printf("Extracted Message: %s\n", message);
+
+    // Close the file
+    fclose(image);
+}
+
+int main() {
+    FILE *image, *output;
+    char message[100];
+    int choice;
+
+    // Open the image file
+    image = fopen("image.bmp", "rb");
+    if (image == NULL) {
+        printf("Error opening image file!\n");
+        return 1;
+    }
+
+    printf("1. Hide message\n2. Extract message\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+
+    switch (choice) {
+
+        case 1:
+            // Open the output image file
+            output = fopen("output.bmp", "wb");
+            if (output == NULL) {
+                printf("Error creating output file!\n");
+                return 1;
+            }
+
+            printf("Enter the message to hide: ");
+            scanf(" %[^\n]s", message);
+
+            // Hide the message within the image
+            hideMessage(image, output, message);
+            printf("Message hidden successfully!\n");
+            break;
+        case 2:
+            // Extract the hidden message from the image
+            extractMessage(image);
+            break;
+        default:
+            printf("Invalid choice!\n");
+    }
+
+    return 0;
+}

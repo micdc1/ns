@@ -1,0 +1,22 @@
+
+import random
+
+def generate_default_password():
+    default_passwords = ['password', '123456', 'qwerty', 'admin', 'letmein', 'welcome']
+    return random.choice(default_passwords)
+
+def check_password_security(password):
+    default_passwords = ['password', '123456', 'qwerty', 'admin', 'letmein', 'welcome']
+    return password in default_passwords
+
+def main():
+    password = generate_default_password()
+    print("Generated default password:", password)
+
+    if check_password_security(password):
+        print("Default password detected. Please change your password immediately.")
+    else:
+        print("Your password is secure. Good job!")
+
+if __name__ == "__main__":
+    main()

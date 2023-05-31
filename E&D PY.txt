@@ -1,0 +1,30 @@
+
+def encrypt(plaintext, shift):
+    ciphertext = ""
+    for char in plaintext:
+        if char.isalpha():
+            # Shift character by specified amount
+            shifted_char = chr((ord(char) - 65 + shift) % 26 + 65)
+        else:
+            shifted_char = char
+        ciphertext += shifted_char
+    return ciphertext
+
+def decrypt(ciphertext, shift):
+    plaintext = ""
+    for char in ciphertext:
+        if char.isalpha():
+            # Shift character by specified amount
+            shifted_char = chr((ord(char) - 65 - shift) % 26 + 65)
+        else:
+            shifted_char = char
+        plaintext += shifted_char
+    return plaintext
+
+# Example usage
+plaintext = "MESCOE"
+shift = 3
+ciphertext = encrypt(plaintext, shift)
+print("Encrypted text:", ciphertext)
+decrypted_text = decrypt(ciphertext, shift)
+print("Decrypted text:", decrypted_text)
